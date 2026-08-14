@@ -163,7 +163,7 @@
   <div class="sub">대한민국 어디로 떠날까? 버튼을 눌러 운명에 맡겨보세요.</div>
 
   <div class="controls">
-    <button class="go" id="go">여행가기 🎰</button>
+    <button class="go" id="go">랜덤 뽑기 🎲</button>
 
     <div class="controls-row">
       <label class="picker">
@@ -178,7 +178,7 @@
   </div>
 
   <div class="excludes" id="excludes">
-    <span class="excludes-title">제외할 도 (누르면 제외)</span>
+    <span class="excludes-title">제외할 지역 (누르면 제외)</span>
     <div class="chips" id="chips"></div>
   </div>
 
@@ -296,10 +296,13 @@
     }
   }
 
+  // "전주시완산구" → "전주시 완산구" (시 뒤에 붙은 구를 띄움)
+  function spaceCity(n) { return n.replace(/^(.+시)(.+구)$/, '$1 $2'); }
   function labelFor(r) {
+    const name = spaceCity(r.n);
     // 전국일 때만 도 약칭을 앞에 붙임 (특정 도 안에선 중복이라 생략)
-    if (filter === 'all') return shortSido(sidoName[r.sido] || '') + ' ' + r.n;
-    return r.n;
+    if (filter === 'all') return shortSido(sidoName[r.sido] || '') + ' ' + name;
+    return name;
   }
 
   // --- 지도 확대/복귀 제어 ---
@@ -371,7 +374,7 @@
     applyBaseView(); // 이전 결과 확대를 원래 화면으로 되돌리고 시작
     result.innerHTML = '<div class="idle">뽑는 중…</div>';
 
-    let delay = 45;          // start fast
+    let delay = 62;          // start fast (총 연출 약 5초)
     let last = -1;
     const total = regions.length;
 
@@ -383,7 +386,7 @@
       last = i;
 
       delay *= 1.12; // decelerate like a slot machine
-      if (delay < 480) {
+      if (delay < 660) {
         setTimeout(step, delay);
       } else {
         finish(i);
@@ -405,7 +408,6 @@
     openModal(name); // 결과를 팝업으로도 띄움
     spinning = false;
     go.disabled = false;
-    go.textContent = '다시 뽑기 🎲';
     prov.disabled = false;
     chipEls.forEach(c => c.disabled = false);
   }
@@ -413,7 +415,6 @@
   prov.addEventListener('change', () => {
     if (spinning) return;
     filter = prov.value;
-    go.textContent = '여행가기 🎰';
     render();
   });
 
