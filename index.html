@@ -460,6 +460,10 @@
   size.addEventListener('input', applySize);
   applySize();
 
+  // 확대해도 지도 박스 크기가 변하지 않도록, 표시 비율을 전국 화면 비율로 고정
+  // (viewBox가 바뀌어도 preserveAspectRatio="meet"가 그 안에 맞춰 그림)
+  { const fv = fullView(); svg.style.aspectRatio = fv[2] + ' / ' + fv[3]; }
+
   render();
 })();
 </script>
